@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --as-bg-radial-a: rgba(173, 190, 194, 0.26);
+  --as-bg-radial-b: rgba(205, 216, 219, 0.38);
+  --as-bg-grad-start: #f7f9fa;
+  --as-bg-grad-mid: #eef2f3;
+  --as-bg-grad-end: #e6ecee;
+  --as-text: #101516;
+  --as-text-muted: rgba(16, 21, 22, 0.8);
+  --as-text-soft: rgba(16, 21, 22, 0.56);
+  --as-border: rgba(16, 21, 22, 0.14);
+  --as-border-strong: rgba(16, 21, 22, 0.28);
+  --as-glass: #f9fbfb;
+  --as-glass-soft: #f2f6f7;
+  --as-panel: #edf3f4;
+  --as-input-bg: rgba(255, 255, 255, 0.9);
+  --as-inverse-bg: #10191c;
+  --as-inverse-text: #f1f6f7;
+  --as-glow-a: rgba(169, 188, 193, 0.24);
+  --as-glow-b: rgba(133, 155, 161, 0.2);
+  --as-grid-line: rgba(16, 21, 22, 0.05);
+  --as-accent: #2f6f7b;
+  --as-accent-soft: rgba(47, 111, 123, 0.12);
+  color-scheme: light;
+}
+
+html.theme-light {
+  color-scheme: light;
+}
+
+html.theme-dark {
+  --as-bg-radial-a: rgba(50, 67, 73, 0.24);
+  --as-bg-radial-b: rgba(35, 50, 56, 0.38);
+  --as-bg-grad-start: #0c1214;
+  --as-bg-grad-mid: #111a1d;
+  --as-bg-grad-end: #172327;
+  --as-text: #e5edef;
+  --as-text-muted: rgba(229, 237, 239, 0.76);
+  --as-text-soft: rgba(229, 237, 239, 0.52);
+  --as-border: rgba(229, 237, 239, 0.16);
+  --as-border-strong: rgba(229, 237, 239, 0.3);
+  --as-glass: #121c20;
+  --as-glass-soft: #17252a;
+  --as-panel: #1b2b30;
+  --as-input-bg: rgba(13, 21, 24, 0.84);
+  --as-inverse-bg: #eaf3f4;
+  --as-inverse-text: #11191c;
+  --as-glow-a: rgba(70, 102, 112, 0.2);
+  --as-glow-b: rgba(52, 80, 88, 0.22);
+  --as-grid-line: rgba(229, 237, 239, 0.1);
+  --as-accent: #84c4cf;
+  --as-accent-soft: rgba(132, 196, 207, 0.16);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(126, 165, 176, 0.35);
+  color: var(--as-text);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 14% 10%, var(--as-bg-radial-a), transparent 36%),
+    radial-gradient(circle at 88% 6%, var(--as-bg-radial-b), transparent 30%),
+    linear-gradient(
+      135deg,
+      var(--as-bg-grad-start) 0%,
+      var(--as-bg-grad-mid) 48%,
+      var(--as-bg-grad-end) 100%
+    );
+  color: var(--as-text);
+  transition:
+    background 280ms ease,
+    color 220ms ease,
+    border-color 220ms ease;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--as-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--as-grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.82), transparent 82%);
+  z-index: -1;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--as-accent);
+  outline-offset: 2px;
+}
