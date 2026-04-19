@@ -1,68 +1,36 @@
-﻿import { useLanguage } from "../hooks/useLanguage";
+﻿import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { fetchProjects, fetchCategories } from "../services/api";
+import { useLanguage } from "../hooks/useLanguage";
 
 export default function ProjectsPage() {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
+  const [projects, setProjects] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const projectNotes =
-    language === "en"
-      ? [
-          {
-            title: "North Patio House",
-            status: "Concept Design",
-            year: "2026",
-            location: "Madrid",
-            summary:
-              "Single-family house with central patio, cross ventilation, and a hybrid concrete-timber system.",
-            progress: "35%"
-          },
-          {
-            title: "City Loft Retrofit",
-            status: "Executive Project",
-            year: "2026",
-            location: "Barcelona",
-            summary:
-              "Full loft renovation with program redistribution, upgraded lighting, and fixed furniture strategy.",
-            progress: "70%"
-          },
-          {
-            title: "Modular Pavilion",
-            status: "Tender Stage",
-            year: "2027",
-            location: "Valencia",
-            summary:
-              "Demountable cultural event system using prefabricated components and dry assembly.",
-            progress: "52%"
-          }
-        ]
-      : [
-          {
-            title: "Casa Patio Norte",
-            status: "Anteproyecto",
-            year: "2026",
-            location: "Madrid",
-            summary:
-              "Vivienda unifamiliar con patio central, ventilacion cruzada y sistema mixto de hormigon y madera.",
-            progress: "35%"
-          },
-          {
-            title: "Reforma Loft Centro",
-            status: "Proyecto Ejecutivo",
-            year: "2026",
-            location: "Barcelona",
-            summary:
-              "Actualizacion integral de un loft urbano con redistribucion de programa, iluminacion y mobiliario fijo.",
-            progress: "70%"
-          },
-          {
-            title: "Pabellon Modular",
-            status: "Licitacion",
-            year: "2027",
-            location: "Valencia",
-            summary:
-              "Sistema desmontable para eventos culturales con piezas prefabricadas y montaje en seco.",
-            progress: "52%"
-          }
-        ];
+  useEffect(() => {
+    const filters = activeCategory ? { category: activeCategory } : {};
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      fetchProjects(filters),
+      categories.length === 0 ? fetchCategories() : Promise.resolve(null)
+    ])
+      .then(([projectsData, categoriesData]) => {
+        setProjects(projectsData);
+        if (categoriesData) setCategories(categoriesData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setProjects([]);
+        setError(err.message || t("No se pudo cargar el portfolio.", "Could not load the portfolio."));
+        setLoading(false);
+      });
+  }, [activeCategory]);
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 pb-16 pt-28 sm:px-6 lg:px-8">
@@ -72,59 +40,133 @@ export default function ProjectsPage() {
             {t("Proyectos", "Projects")}
           </p>
           <h1 className="mt-2 font-['Space_Grotesk'] text-5xl leading-[0.95] text-[var(--as-text)] sm:text-6xl">
-            {t("Pipeline del Estudio", "Studio Pipeline")}
+            {t("Portfolio del Estudio", "Studio Portfolio")}
           </h1>
         </div>
         <p className="max-w-xl text-sm leading-relaxed text-[var(--as-text-muted)]">
           {t(
-            "Vista general de etapas activas, con seguimiento de avance y foco en coordinacion tecnica.",
-            "Overview of active stages with progress tracking and technical coordination focus."
+            "Seleccion de proyectos desarrollados por el estudio en distintas escalas y contextos.",
+            "Selection of projects developed by the studio across different scales and contexts."
           )}
         </p>
       </header>
 
-      <section className="space-y-5">
-        {projectNotes.map((project, index) => (
-          <article
-            key={project.title}
-            className="grid gap-6 border border-[color:var(--as-border)] bg-[var(--as-glass-soft)] p-6 lg:grid-cols-[0.25fr_1fr_0.35fr] lg:items-center"
+      {/* Category Filter */}
+      {categories.length > 0 && (
+        <nav className="mb-8 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveCategory(null)}
+            className={`border px-3 py-1.5 text-[10px] uppercase tracking-[0.12em] transition ${
+              activeCategory === null
+                ? "border-[color:var(--as-border-strong)] bg-[var(--as-inverse-bg)] text-[var(--as-inverse-text)]"
+                : "border-[color:var(--as-border)] text-[var(--as-text-soft)] hover:border-[color:var(--as-border-strong)]"
+            }`}
           >
-            <div className="flex items-center gap-3 border-b border-[color:var(--as-border)] pb-4 lg:block lg:border-b-0 lg:pb-0">
-              <span className="font-['Space_Grotesk'] text-3xl leading-none text-[var(--as-text)]">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--as-text-soft)]">
-                {project.status}
-              </p>
-            </div>
+            {t("Todos", "All")}
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setActiveCategory(cat.slug)}
+              className={`border px-3 py-1.5 text-[10px] uppercase tracking-[0.12em] transition ${
+                activeCategory === cat.slug
+                  ? "border-[color:var(--as-border-strong)] bg-[var(--as-inverse-bg)] text-[var(--as-inverse-text)]"
+                  : "border-[color:var(--as-border)] text-[var(--as-text-soft)] hover:border-[color:var(--as-border-strong)]"
+              }`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </nav>
+      )}
 
-            <div>
-              <h2 className="font-['Space_Grotesk'] text-3xl leading-[1] text-[var(--as-text)]">
-                {project.title}
-              </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--as-text-muted)]">
-                {project.summary}
-              </p>
-            </div>
+      {/* Loading */}
+      {loading && (
+        <div className="flex min-h-[30vh] items-center justify-center">
+          <p className="text-xs uppercase tracking-[0.14em] text-[var(--as-text-soft)]">
+            {t("Cargando proyectos...", "Loading projects...")}
+          </p>
+        </div>
+      )}
 
-            <div className="space-y-3 lg:justify-self-end lg:text-right">
-              <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--as-text-soft)]">
-                {project.location} | {project.year}
-              </p>
-              <p className="font-['Space_Grotesk'] text-2xl text-[var(--as-text)]">
-                {project.progress}
-              </p>
-              <div className="h-1.5 w-full overflow-hidden bg-[var(--as-panel)] lg:w-44">
-                <div
-                  className="h-full bg-[var(--as-accent)]"
-                  style={{ width: project.progress }}
-                />
+      {/* Error State */}
+      {!loading && error && (
+        <div className="flex min-h-[30vh] flex-col items-center justify-center gap-3 text-center">
+          <p className="text-xs uppercase tracking-[0.14em] text-[var(--as-text-soft)]">
+            {t("No se pudo cargar el portfolio.", "Could not load the portfolio.")}
+          </p>
+          <p className="max-w-xl text-sm leading-relaxed text-[var(--as-text-muted)]">
+            {error}
+          </p>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && projects.length === 0 && (
+        <div className="flex min-h-[30vh] items-center justify-center">
+          <p className="text-xs uppercase tracking-[0.14em] text-[var(--as-text-soft)]">
+            {t(
+              "No hay proyectos disponibles aun. Gestionalos desde el panel admin.",
+              "No projects available yet. Manage them from the admin panel."
+            )}
+          </p>
+        </div>
+      )}
+
+      {/* Project Grid */}
+      {!loading && !error && projects.length > 0 && (
+        <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <Link
+              key={project.id}
+              to={`/proyecto/${project.slug}`}
+              className="group border border-[color:var(--as-border)] bg-[var(--as-glass-soft)] transition hover:border-[color:var(--as-border-strong)]"
+            >
+              {project.cover_image && (
+                <div className="aspect-[16/10] overflow-hidden">
+                  <img
+                    src={project.cover_image}
+                    alt={project.title}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+
+              <div className="p-5">
+                <div className="mb-3 flex items-center justify-between">
+                  {project.category && (
+                    <span className="text-[10px] uppercase tracking-[0.12em] text-[var(--as-text-soft)]">
+                      {project.category.name}
+                    </span>
+                  )}
+                  {project.year && (
+                    <span className="text-[10px] uppercase tracking-[0.12em] text-[var(--as-text-soft)]">
+                      {project.year}
+                    </span>
+                  )}
+                </div>
+
+                <h2 className="font-['Space_Grotesk'] text-2xl leading-[1] text-[var(--as-text)]">
+                  {project.title}
+                </h2>
+
+                {project.location && (
+                  <p className="mt-2 text-[10px] uppercase tracking-[0.12em] text-[var(--as-text-soft)]">
+                    {project.location}
+                  </p>
+                )}
+
+                <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-[var(--as-text-muted)]">
+                  {project.description}
+                </p>
               </div>
-            </div>
-          </article>
-        ))}
-      </section>
+            </Link>
+          ))}
+        </section>
+      )}
     </main>
   );
 }
-

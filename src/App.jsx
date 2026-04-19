@@ -7,6 +7,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ProjectsPage = lazy(() => import("./pages/ProjectsPage"));
+const ProjectDetailPage = lazy(() => import("./pages/ProjectDetailPage"));
 const ImagesPage = lazy(() => import("./pages/ImagesPage"));
 const MetodoCreativoPage = lazy(() => import("./pages/MetodoCreativoPage"));
 const MetodoCreativoDetailPage = lazy(() => import("./pages/MetodoCreativoDetailPage"));
@@ -33,6 +34,7 @@ function StudioApp() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/proyectos" element={<ProjectsPage />} />
+          <Route path="/proyecto/:slug" element={<ProjectDetailPage />} />
           <Route path="/projects" element={<Navigate to="/proyectos" replace />} />
           <Route path="/galeria" element={<ImagesPage />} />
           <Route path="/gallery" element={<Navigate to="/galeria" replace />} />

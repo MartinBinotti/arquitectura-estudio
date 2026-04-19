@@ -28,6 +28,13 @@ npm run dev
 
 La app quedará disponible en `http://localhost:5173`.
 
+Configura el backend CMS en `.env`:
+
+```bash
+VITE_API_URL=http://localhost:8000/api/v1
+VITE_STORAGE_URL=http://localhost:8000/storage
+```
+
 ## Build de producción
 
 ```bash
@@ -70,4 +77,3 @@ git push -u origin main
 - `npm run dev`: inicia servidor de desarrollo
 - `npm run build`: genera build de producción
 - `npm run preview`: previsualiza el build
-
